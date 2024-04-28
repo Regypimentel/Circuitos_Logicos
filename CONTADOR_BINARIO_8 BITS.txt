@@ -1,0 +1,46 @@
+//CONTADOR BINÁRIO DE 8 BITS:
+
+#include <Arduino.h>
+
+// Definição dos pinos para os LEDs
+#define D0 15
+#define D1 2
+#define D2 4
+#define D3 16
+#define D4 17
+#define D5 5
+#define D6 18
+#define D7 19
+
+#define MASK 1 // Máscara para operações de bit
+
+// Função para escrever o valor binário nos LEDs
+void escreveBinario(unsigned char valor) {
+  int pinos[] = {D0, D1, D2, D3, D4, D5, D6, D7}; // Array para os pinos dos LEDs
+
+  // Loop para percorrer cada bit do valor
+  for (int i = 0; i < 8; i++) {
+    // Verifica se o bit atual do valor é 1
+    if (valor & (MASK << i)) {
+      digitalWrite(pinos[i], HIGH); // Define o LED correspondente como ligado
+    } else {
+      digitalWrite(pinos[i], LOW); // Define o LED correspondente como desligado
+    }
+  }
+}
+
+void setup() {
+  // Configuração dos pinos como saída para os LEDs
+  pinMode(D0, OUTPUT); pinMode(D1, OUTPUT); 
+  pinMode(D2, OUTPUT); pinMode(D3, OUTPUT); 
+  pinMode(D4, OUTPUT); pinMode(D5, OUTPUT); 
+  pinMode(D6, OUTPUT); pinMode(D7, OUTPUT);
+}
+
+void loop() {
+  // Loop principal
+  for (unsigned char contador = 0; contador < 256; contador++) { // Contagem de 0 a 255
+    escreveBinario(contador); // Escreve o valor binário atual nos LEDs
+    delay(200); // Aguarda 200 milissegundos
+  }
+}
