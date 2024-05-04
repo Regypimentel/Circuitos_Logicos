@@ -1,7 +1,7 @@
 //CONTADOR DIGITAL DE NÚMEROS HEXADECIMAIS DE 1 DÍGITO
 
 // Define os pinos para os segmentos do display de sete segmentos
-const int segmentos[7] = {21, 19, 18, 5, 4, 2, 15}; // D21, D19, D18, D5, D4, D2, D15
+const int segmentos[7] = {21, 22, 15, 2, 4, 16, 17}; // D21(R1), D22(R2), D15(R5), D2(R4), D4(R7), D16(R4), D17(R3)
 
 // Números hexadecimais para exibir em cada segmento do display
 const byte numeros[16] = {
