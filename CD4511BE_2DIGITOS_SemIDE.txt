@@ -1,0 +1,64 @@
+//// Contador 2 digitos,CI4511(SEM IDE_ARDUINO)
+
+#include <wiringPi.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <unistd.h>
+
+// Define os pinos conectados aos CD4511
+#define pinA_1 0
+#define pinB_1 2
+#define pinC_1 3
+#define pinD_1 7
+#define pinA_2 21
+#define pinB_2 22
+#define pinC_2 23
+#define pinD_2 24
+
+// Função para enviar um dígito para o CD4511
+void enviarDigito(int digito, int ci) {
+  if (ci == 1) {
+    // Converter o dígito para BCD para o primeiro CI
+    digitalWrite(pinA_1, digito & 0x01);
+    digitalWrite(pinB_1, (digito >> 1) & 0x01);
+    digitalWrite(pinC_1, (digito >> 2) & 0x01);
+    digitalWrite(pinD_1, (digito >> 3) & 0x01);
+  } else if (ci == 2) {
+    // Converter o dígito para BCD para o segundo CI
+    digitalWrite(pinA_2, digito & 0x01);
+    digitalWrite(pinB_2, (digito >> 1) & 0x01);
+    digitalWrite(pinC_2, (digito >> 2) & 0x01);
+    digitalWrite(pinD_2, (digito >> 3) & 0x01);
+  }
+}
+
+int main() {
+  // Inicializa a biblioteca WiringPi
+  wiringPiSetup();
+  
+  // Configura os pinos como saídas
+  pinMode(pinA_1, OUTPUT);
+  pinMode(pinB_1, OUTPUT);
+  pinMode(pinC_1, OUTPUT);
+  pinMode(pinD_1, OUTPUT);
+  pinMode(pinA_2, OUTPUT);
+  pinMode(pinB_2, OUTPUT);
+  pinMode(pinC_2, OUTPUT);
+  pinMode(pinD_2, OUTPUT);
+
+  // Contador de 0 a 99
+  for (int i = 0; i < 100; i++) {
+    int digito1 = i / 10; // Dígito mais significativo
+    int digito2 = i % 10; // Dígito menos significativo
+    
+    // Envia o dígito mais significativo para o primeiro CI
+    enviarDigito(digito1, 1);
+    // Envia o dígito menos significativo para o segundo CI
+    enviarDigito(digito2, 2);
+    
+    usleep(1000000); // Atraso de 1 segundo
+  }
+
+  return 0;
+}

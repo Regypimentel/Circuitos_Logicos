@@ -1,0 +1,100 @@
+// Contador 2 digitos,CI4511
+const int pinA_1 = 17;
+const int pinB_1 = 15;
+const int pinC_1 = 2;
+const int pinD_1 = 16;
+const int pinA_2 = 23;
+const int pinB_2 = 19;
+const int pinC_2 = 21;// Define os pinos conectados aos CD4511
+const int pinA_1 = 17;
+const int pinB_1 = 15;
+const int pinC_1 = 2;
+const int pinD_1 = 16;
+const int pinA_2 = 23;
+const int pinB_2 = 19;
+const int pinC_2 = 21;
+const int pinD_2 = 22; 
+
+// Função para enviar um dígito para o CD4511
+void enviarDigito(int digito, int ci) {
+  if (ci == 1) {
+    // Converter o dígito para BCD para o primeiro CI
+    digitalWrite(pinA_1, digito & 0x01);
+    digitalWrite(pinB_1, (digito >> 1) & 0x01);
+    digitalWrite(pinC_1, (digito >> 2) & 0x01);
+    digitalWrite(pinD_1, (digito >> 3) & 0x01);
+  } else if (ci == 2) {
+    // Converter o dígito para BCD para o segundo CI
+    digitalWrite(pinA_2, digito & 0x01);
+    digitalWrite(pinB_2, (digito >> 1) & 0x01);
+    digitalWrite(pinC_2, (digito >> 2) & 0x01);
+    digitalWrite(pinD_2, (digito >> 3) & 0x01);
+  }
+}
+
+void setup() {
+  // Configura os pinos como saídas
+  pinMode(pinA_1, OUTPUT);
+  pinMode(pinB_1, OUTPUT);
+  pinMode(pinC_1, OUTPUT);
+  pinMode(pinD_1, OUTPUT);
+  pinMode(pinA_2, OUTPUT);
+  pinMode(pinB_2, OUTPUT);
+  pinMode(pinC_2, OUTPUT);
+  pinMode(pinD_2, OUTPUT);
+}
+
+void loop() {
+  // Contador de 0 a 99
+  for (int i = 0; i < 100; i++) {
+    int digito1 = i / 10; // Dígito mais significativo
+    int digito2 = i % 10; // Dígito menos significativo
+    
+    // Envia o dígito mais significativo para o primeiro CI
+    enviarDigito(digito1, 1);
+    // Envia o dígito menos significativo para o segundo CI
+    enviarDigito(digito2, 2);
+    
+    delay(1000); // Atraso de 1 segundo
+  }
+}
+
+const int pinD_2 = 22; // Ajustei o pino D_2 para 22, uma vez que o 16 já está sendo usado pelo outro CI
+
+// Função para enviar um dígito para o CD4511
+void enviarDigito(int digito, int ci) {
+  if (ci == 1) {
+    // Converter o dígito para BCD para o primeiro CI
+    digitalWrite(pinA_1, digito & 0x01);
+    digitalWrite(pinB_1, (digito >> 1) & 0x01);
+    digitalWrite(pinC_1, (digito >> 2) & 0x01);
+    digitalWrite(pinD_1, (digito >> 3) & 0x01);
+  } else if (ci == 2) {
+    // Converter o dígito para BCD para o segundo CI
+    digitalWrite(pinA_2, digito & 0x01);
+    digitalWrite(pinB_2, (digito >> 1) & 0x01);
+    digitalWrite(pinC_2, (digito >> 2) & 0x01);
+    digitalWrite(pinD_2, (digito >> 3) & 0x01);
+  }
+}
+
+void setup() {
+  // Configura os pinos como saídas
+  pinMode(pinA_1, OUTPUT);
+  pinMode(pinB_1, OUTPUT);
+  pinMode(pinC_1, OUTPUT);
+  pinMode(pinD_1, OUTPUT);
+  pinMode(pinA_2, OUTPUT);
+  pinMode(pinB_2, OUTPUT);
+  pinMode(pinC_2, OUTPUT);
+  pinMode(pinD_2, OUTPUT);
+}
+
+void loop() {
+  // Exemplo de exibição de dígitos de 0 a 9 nos dois CI's
+  for (int i = 0; i <= 9; i++) {
+    enviarDigito(i, 1); // Envia o dígito para o primeiro CI
+    enviarDigito(i, 2); // Envia o dígito para o segundo CI
+    delay(1000); // Exibe cada dígito por 1 segundo
+  }
+}
