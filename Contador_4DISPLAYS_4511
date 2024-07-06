@@ -1,0 +1,77 @@
+#include <Arduino.h>
+
+#define DATA_PIN 19 //D19 (DS)
+#define CLOCK_PIN 18//D18  (SH_CP)
+#define LATCH_PIN 5 //D5   (ST_CP)
+
+#define DATA_PIN_2 22 //D22 (DS)
+#define CLOCK_PIN_2 4 //D4  (SH_CP)
+#define LATCH_PIN_2 2 //D2 (ST_CP) 
+
+//
+void shiftOutData(byte data) {
+    Serial.print("shiftOutData: ");
+    Serial.println(data, BIN);
+    digitalWrite(LATCH_PIN, LOW);
+    shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, data);
+    digitalWrite(LATCH_PIN, HIGH);
+}
+
+void shiftOutData2(byte data) {
+    Serial.print("shiftOutData2: ");
+    Serial.println(data, BIN);
+    digitalWrite(LATCH_PIN_2, LOW);
+    shiftOut(DATA_PIN_2, CLOCK_PIN_2, MSBFIRST, data);
+    digitalWrite(LATCH_PIN_2, HIGH);
+}
+
+//
+void setup() {
+    Serial.begin(9600);
+    pinMode(DATA_PIN, OUTPUT);
+    pinMode(CLOCK_PIN, OUTPUT);
+    pinMode(LATCH_PIN, OUTPUT);
+    
+    pinMode(DATA_PIN_2, OUTPUT);
+    pinMode(CLOCK_PIN_2, OUTPUT);
+    pinMode(LATCH_PIN_2, OUTPUT);
+
+}
+
+//
+void loop() {
+    
+    for (int i = 0; i < 10000; i++) {
+       
+        //escreve_digito(numberSegments[i]); // Exibe números de 0 a 9 no display
+        int numero = i;
+
+
+        byte d1 = (numero / 1)%10;
+        byte d2 = (numero / 10)%10;
+        byte d3 = (numero / 100)%10;
+        byte d4 = (numero / 1000)%10;
+
+        Serial.print("i: ");
+        Serial.print(i);
+        Serial.print(", d1: ");
+        Serial.print(d1);
+        Serial.print(", d2: ");
+        Serial.print(d2);
+        Serial.print(", d3: ");
+        Serial.print(d3);
+        Serial.print(", d4: ");
+        Serial.println(d4);
+
+        byte x = (d2 << 4) | d1;
+        shiftOutData(x);
+        delay(1);        
+
+        byte y = (d4 << 4) | d3;
+        shiftOutData2(y);
+        delay(1);
+        
+
+
+    }
+}
