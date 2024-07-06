@@ -1,0 +1,120 @@
+
+#include <Arduino.h>
+#include <Adafruit_ADS1X15.h>
+#include <SPI.h>
+
+#define DATA_PIN 19  //D19 (DS)
+#define CLOCK_PIN 18 //D18 (SH_CP)
+#define LATCH_PIN 5  //D5 (ST_CP)
+
+#define DATA_PIN_2 17 //D17 (DS)
+#define CLOCK_PIN_2 4 //D4(SH_CP)
+#define LATCH_PIN_2 2 //D2 (ST_CP)
+
+//VDD (3V3)
+//GND (GND DA ESP)
+//SDA (GPIO21)
+//SCL (GPIO22)
+//ADDR (GND DA ESP)
+//A1ouADC1 ( NO MEIO DO RESISTORES DE 1M E 10M)
+//GNDdoDivisorTensão (GND DO Circuito)
+
+Adafruit_ADS1115 ads; 
+
+void shiftOutData(byte data) {
+    Serial.print("shiftOutData: ");
+    Serial.println(data, BIN);
+    digitalWrite(LATCH_PIN, LOW);
+    shiftOut(DATA_PIN, CLOCK_PIN, MSBFIRST, data);
+    digitalWrite(LATCH_PIN, HIGH);
+}
+
+void shiftOutData2(byte data) {
+    Serial.print("shiftOutData2: ");
+    Serial.println(data, BIN);
+    digitalWrite(LATCH_PIN_2, LOW);
+    shiftOut(DATA_PIN_2, CLOCK_PIN_2, MSBFIRST, data);
+    digitalWrite(LATCH_PIN_2, HIGH);
+}
+
+void setup() {
+    pinMode(DATA_PIN, OUTPUT);
+    pinMode(CLOCK_PIN, OUTPUT);
+    pinMode(LATCH_PIN, OUTPUT);
+
+    pinMode(DATA_PIN_2, OUTPUT);
+    pinMode(CLOCK_PIN_2, OUTPUT);
+    pinMode(LATCH_PIN_2, OUTPUT);
+
+    ads.begin(); // 
+
+    ads.setGain(GAIN_ONE); // ganho de 3v pra cima, 4096 bits.
+    if (!ads.begin()) { // se o conversor não inicializar, ficará em um loop infinito.
+        while (1);
+    }
+
+    Serial.begin(9600);
+}
+void loop() {
+    int16_t adc1; //Escolhendo na porta A1 
+    float v1;
+
+    adc1 = ads.readADC_SingleEnded(1); // 
+
+    v1 = adc1 * 0.125; // multiplica pelo ganho equivalente a 4096 bits
+
+    int numero = (int)v1; // transforma o valor float da tensão vout em um número inteiro. Ex: 0.2v = 0; 1.5v = 1.
+
+    float vin = (numero * 11.0) * (106.25 / 100); // pelo divisor de tensão, tensão de entrada Vin será 11 vezes maior que vout, considerando R1 = 10M, R2= 1M
+
+    int resultado = vin; // transforma o valor da tensão nominal da fonte em um valor inteiro (Vi)
+
+                                                                    // Para Resultado 
+                                                                    //                   3 = 0v ;
+                                                                    //                  33 = 0.03v ; 
+                                                                    //                 333 = 0.3v;
+                                                                    //                  3k = 3v ; 
+                                                                    //                 30k = 30v ; 
+
+    if (resultado < 10 )                               // Valores que nosso display nao considera 
+    {
+       resultado = 0 ;
+    }
+    if (resultado >= 10 && resultado < 99)             //valores entre (0.01v e 0.09v)
+    {
+        resultado /= 10;
+    }
+    if (resultado >= 100 && resultado < 999)           //valores entre 0.1v e 0.9v)
+    {
+        resultado /= 10;
+    }
+    else if (resultado >= 1000 && resultado <= 9999) { // lógica para tensão entre (1v, 9.9v)
+        resultado /= 10;
+    }
+    if (resultado >= 10000) {                          // lógica para tensão maior ou igual a 10v
+        resultado /= 10;
+    }
+    
+    // Controle dos LEDs
+    byte d1 = (resultado / 1) % 10;  // Extrai o dígito das unidades (0.01)
+    byte d2 = (resultado / 10) % 10;  // Extrai o dígito das dezenas (0.1)
+    byte d3 = (resultado / 100) % 10;  // Extrai o dígito das centenas (1)
+    byte d4 = (resultado / 1000) % 10;  // Extrai o dígito10 dos milhares ()
+
+    if (resultado < 1000) {
+    byte x = (d2 << 4) | d1;   // Combina d2 e d1
+    shiftOutData(x);           // Envia x para o primeiro display
+
+    byte y = (0 << 4) | d3;    // Combina 0 e d3 para mostrar o dígito 3 no segundo display
+    shiftOutData2(y);          // Envia y para o segundo display
+} else {
+    byte x = (d2 << 4) | d1;   // Combina d2 e d1
+    shiftOutData(x);           // Envia x para o primeiro display
+
+    byte y = (d4 << 4) | d3;   // Combina d4 e d3
+    shiftOutData2(y);          // Envia y para o segundo display
+}
+    Serial.println(v1);
+    Serial.println(resultado );
+    delay(2000);
+}
